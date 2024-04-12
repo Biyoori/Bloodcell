@@ -1,12 +1,12 @@
 import pygame
 from pygame.locals import *
 from player import Player
+from enemy import Enemy
 
 winWidth, winHeight = 740, 740
 fps = 60
 
 cellSize = 64
-
 
 colors = {"black": (0, 0, 0),
           "white": (255, 255, 255),
@@ -16,12 +16,12 @@ colors = {"black": (0, 0, 0),
 
 grid = [[1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,2,0,0,0,1],
         [1,0,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,3,3,0,0,1],
         [1,1,1,1,1,1,2,0,0,1],
         [1,1,1,1,1,1,1,1,1,1]]
 
@@ -36,6 +36,8 @@ def main():
     playerBlock = pygame.image.load("Data\Tiles\player-block.png").convert_alpha()
     player = Player(8*cellSize, 2*cellSize, cellSize)
 
+    enemyList = []
+
     run = True
     while run:
         clock.tick(fps)
@@ -49,14 +51,25 @@ def main():
                     screen.blit(pygame.transform.scale(tile, (cellSize, cellSize)), (j* cellSize, i*cellSize))
                 elif cell == 2:
                     screen.blit(pygame.transform.scale(playerBlock, (cellSize, cellSize)), (j* cellSize, i*cellSize)) 
+                elif cell == 3:
+                    pygame.draw.rect(screen, colors["darkblue"], (j * cellSize, i * cellSize, cellSize, cellSize))
+                    if not any(enemy.posX == j * cellSize and enemy.posY == i * cellSize for enemy in enemyList):
+                        newEnemy = Enemy(j * cellSize, i * cellSize, cellSize)
+                        enemyList.append(newEnemy)
                 else:
                     pygame.draw.rect(screen, colors["darkblue"], (j * cellSize, i * cellSize, cellSize, cellSize))
+
+        for enemy in enemyList:
+            enemy.draw(screen)
+            enemy.update()
+            player.isDeadCheck(enemy.hitBox)
+            #pygame.draw.rect(screen, colors["red"], enemy.hitBox)
 
         player.draw(screen)
         player.update()
         player.moveUpdate(grid)
+        
 
-        #pygame.draw.rect(screen, colors["red"], player.hitBox)
 
 
         for e in pygame.event.get():
