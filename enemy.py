@@ -17,7 +17,7 @@ class Enemy:
         self.hitBox = pygame.Rect(self.posX + self.cellSize/4, self.posY + self.cellSize/2, *pygame.Surface.get_size(self.activeAnim[0]))
     def loadFrames(self, spritesheet, startIndex, endIndex):
         frameWidth = 32
-        frameHeight = 25
+        frameHeight = 14
         frames = []
         for i in range(startIndex * frameWidth, endIndex * frameWidth, frameWidth):
             frame = spritesheet.subsurface((i, 0, frameWidth, frameHeight))
@@ -29,7 +29,7 @@ class Enemy:
         if self.isAnimChanged(frames):
             self.currentFrame = 0
         currentFrame = frames[int(self.currentFrame)]
-        surface.blit(pygame.transform.scale(currentFrame, (64, 64), ), (self.posX, self.posY))
+        surface.blit(pygame.transform.scale(currentFrame, (80, 64), ), (self.posX, self.posY))
 
     def update(self):
         frames = self.animChange(self.idleFrames)

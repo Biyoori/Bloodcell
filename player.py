@@ -1,5 +1,5 @@
 import pygame
-from enemy import Enemy
+from playerBlock import PlayerBlock
 
 class Player:
     def __init__(self, posX, posY, cellSize) -> None:
@@ -22,6 +22,7 @@ class Player:
         self.isMoving = False
         self.isFalling = False
         self.isDead = False
+        self.isBlockNearby = False
         self.prevAnim = self.idleFrames
         self.activeDirection = 1
         self.activeAnim = self.animChange(self.idleFrames, self.moveFrames, self.fallFrames, self.deathFrames)
@@ -79,11 +80,12 @@ class Player:
             return False
 
     def move(self, direction, grid):
-            if self.posX == self.targetX and not self.isFalling and not self.isDead:
+            self.activeDirection = direction
+            if self.posX == self.targetX and not self.isFalling and not self.isDead and not self.isBlockNearby:
                 newTargetX = self.posX + direction * self.cellSize
                 if grid[self.posY//self.cellSize][newTargetX//self.cellSize] != 1:
                     self.targetX = newTargetX
-                    self.activeDirection = direction
+                    
 
     def moveUpdate(self, grid):
         if self.posX == self.targetX:
@@ -99,7 +101,7 @@ class Player:
         self.hitBox = pygame.Rect(self.posX + self.cellSize/4, self.posY + self.cellSize/4, *pygame.Surface.get_size(self.activeAnim[0]))
         newTargetY = self.posY + self.cellSize
         targetGridX = int(self.posX//self.cellSize)
-               
+
         if self.posY < (len(grid)-1)*self.cellSize and grid[newTargetY//self.cellSize][targetGridX] != 1:
             self.isFalling = True
             self.targetY = newTargetY
@@ -117,3 +119,11 @@ class Player:
     def isDeadCheck(self, enemy):
         if self.isColliding(enemy):
             self.isDead = True
+
+    def pushBlock(self, blocks):
+        for block in blocks:
+            targetX, targetY = self.posX + self.activeDirection * self.cellSize, self.posY
+            if (block.posX, block.posY) == (targetX, targetY):
+                self.isBlockNearby = True
+                return
+        self.isBlockNearby = False
